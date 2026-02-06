@@ -16,8 +16,11 @@ export default function App() {
   const pathname = window.location.pathname;
   const isEncoderRoute = pathname === '/encode' || pathname.endsWith('/encode');
 
-  // Decode receiver name from URL query parameter
+  // Decode receiver name from URL query parameter or localStorage
   useEffect(() => {
+    const STORAGE_KEY = 'valentine_receiver';
+    
+    // First, try to get from URL query parameter
     const params = new URLSearchParams(window.location.search);
     const encodedName = params.get('receiver');
     
@@ -25,6 +28,24 @@ export default function App() {
       const decoded = decodeName(encodedName);
       if (decoded) {
         setReceiverName(decoded);
+        // Store the encoded name in localStorage for future use
+        localStorage.setItem(STORAGE_KEY, encodedName);
+      }
+      
+      // Remove the query parameter from URL for privacy
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+    } else {
+      // If not in URL, try to get from localStorage
+      const storedEncodedName = localStorage.getItem(STORAGE_KEY);
+      if (storedEncodedName) {
+        const decoded = decodeName(storedEncodedName);
+        if (decoded) {
+          setReceiverName(decoded);
+        } else {
+          // If stored value is invalid, remove it
+          localStorage.removeItem(STORAGE_KEY);
+        }
       }
     }
   }, []);
