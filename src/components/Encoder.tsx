@@ -1,13 +1,24 @@
-import React, { useState } from 'react';
+'use client'
+
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Copy, Check, Lock } from 'lucide-react';
 import { encodeName } from './ui/utils';
+import { usePathname } from 'next/navigation';
 
 export const Encoder: React.FC = () => {
   const [inputText, setInputText] = useState('');
   const [encodedText, setEncodedText] = useState('');
   const [copied, setCopied] = useState(false);
   const [fullUrl, setFullUrl] = useState('');
+  const [baseUrl, setBaseUrl] = useState('');
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setBaseUrl(window.location.origin);
+    }
+  }, []);
 
   const handleEncode = () => {
     if (!inputText.trim()) {
@@ -20,7 +31,6 @@ export const Encoder: React.FC = () => {
     setEncodedText(encoded);
     
     // Generate full URL
-    const baseUrl = window.location.origin + window.location.pathname;
     const url = `${baseUrl}?receiver=${encoded}`;
     setFullUrl(url);
   };
@@ -61,10 +71,9 @@ export const Encoder: React.FC = () => {
                 value={inputText}
                 onChange={(e) => {
                   setInputText(e.target.value);
-                  if (e.target.value.trim()) {
+                  if (e.target.value.trim() && baseUrl) {
                     const encoded = encodeName(e.target.value.trim());
                     setEncodedText(encoded);
-                    const baseUrl = window.location.origin + window.location.pathname;
                     setFullUrl(`${baseUrl}?receiver=${encoded}`);
                   } else {
                     setEncodedText('');

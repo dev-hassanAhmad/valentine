@@ -1,31 +1,25 @@
-import { ref, push } from "firebase/database";
-import { database } from "../config/firebase";
-
-export interface ProposalAcceptance {
-  receiverName: string | null;
-  timestamp: number;
-  date: string;
-  userAgent?: string;
-}
-
 /**
- * Logs a proposal acceptance to Firebase Realtime Database
+ * Logs a proposal acceptance via API
  * @param receiverName - The name of the person who received the proposal (if provided)
  */
 export async function logProposalAcceptance(receiverName: string | null): Promise<void> {
   try {
-    const acceptanceData: ProposalAcceptance = {
-      receiverName: receiverName || "Anonymous",
-      timestamp: Date.now(),
-      date: new Date().toISOString(),
-      userAgent: navigator.userAgent,
-    };
+    const response = await fetch('/api/proposals', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        receiverName,
+      }),
+    });
 
-    // Push data to Firebase Realtime Database
-    const proposalsRef = ref(database, "proposals");
-    await push(proposalsRef, acceptanceData);
-    
-    console.log("Proposal acceptance logged successfully");
+    if (!response.ok) {
+      throw new Error('Failed to log proposal acceptance');
+    }
+
+    const data = await response.json();
+    console.log("Proposal acceptance logged successfully:", data.message);
   } catch (error) {
     console.error("Error logging proposal acceptance:", error);
     // Don't throw - we don't want to break the user experience if logging fails
