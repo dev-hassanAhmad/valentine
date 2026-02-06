@@ -26,7 +26,7 @@ function HomeContent() {
     const encodedName = searchParams.get('receiver');
     
     if (encodedName) {
-      const decoded = decodeName(encodedName);
+      const decoded = encodedName;
       if (decoded) {
         setReceiverName(decoded);
         // Store the encoded name in localStorage for future use
@@ -42,7 +42,7 @@ function HomeContent() {
       if (typeof window !== 'undefined') {
         const storedEncodedName = localStorage.getItem(STORAGE_KEY);
         if (storedEncodedName) {
-          const decoded = decodeName(storedEncodedName);
+          const decoded = storedEncodedName;
           if (decoded) {
             setReceiverName(decoded);
           } else {
