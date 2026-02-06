@@ -4,9 +4,30 @@ import { Heart } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { ProposalCard } from './components/ProposalCard';
 import { SuccessView } from './components/SuccessView';
+import { Encoder } from './components/Encoder';
+import { decodeName } from './components/ui/utils';
+import { logProposalAcceptance } from './services/proposalService';
 
 export default function App() {
   const [accepted, setAccepted] = useState(false);
+  const [receiverName, setReceiverName] = useState<string | null>(null);
+
+  // Check if we're on the encoder route
+  const pathname = window.location.pathname;
+  const isEncoderRoute = pathname === '/encode' || pathname.endsWith('/encode');
+
+  // Decode receiver name from URL query parameter
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const encodedName = params.get('receiver');
+    
+    if (encodedName) {
+      const decoded = decodeName(encodedName);
+      if (decoded) {
+        setReceiverName(decoded);
+      }
+    }
+  }, []);
 
   // Effect to trigger confetti when accepted
   useEffect(() => {
@@ -45,6 +66,11 @@ export default function App() {
     }
   }, [accepted]);
 
+  // Show encoder if on encoder route
+  if (isEncoderRoute) {
+    return <Encoder />;
+  }
+
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-pink-100 via-rose-200 to-red-100 flex flex-col items-center justify-center p-4">
       {/* Animated Background Blobs */}
@@ -64,7 +90,14 @@ export default function App() {
             transition={{ duration: 0.5 }}
             className="z-10 w-full max-w-md"
           >
-            <ProposalCard onAccept={() => setAccepted(true)} />
+            <ProposalCard 
+              onAccept={async () => {
+                setAccepted(true);
+                // Log the proposal acceptance to Firebase
+                await logProposalAcceptance(receiverName);
+              }} 
+              receiverName={receiverName} 
+            />
           </motion.div>
         ) : (
           <motion.div

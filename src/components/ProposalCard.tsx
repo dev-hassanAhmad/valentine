@@ -8,9 +8,10 @@ const HERO_IMAGE = "https://images.unsplash.com/photo-1548544099-a89e27f73a84?cr
 
 interface ProposalCardProps {
   onAccept: () => void;
+  receiverName?: string | null;
 }
 
-export const ProposalCard: React.FC<ProposalCardProps> = ({ onAccept }) => {
+export const ProposalCard: React.FC<ProposalCardProps> = ({ onAccept, receiverName }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const buttonsContainerRef = useRef<HTMLDivElement>(null);
@@ -70,7 +71,15 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({ onAccept }) => {
 
       {/* Heading */}
       <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2 leading-tight">
-        Will you be my <span className="text-pink-500 inline-block transform hover:scale-110 transition-transform cursor-default">Valentine?</span> 💖
+        {receiverName ? (
+          <>
+            {receiverName}, will you be my <span className="text-pink-500 inline-block transform hover:scale-110 transition-transform cursor-default">Valentine?</span> 💖
+          </>
+        ) : (
+          <>
+            Will you be my <span className="text-pink-500 inline-block transform hover:scale-110 transition-transform cursor-default">Valentine?</span> 💖
+          </>
+        )}
       </h1>
       
       <p className="text-gray-500 mb-10 text-lg">

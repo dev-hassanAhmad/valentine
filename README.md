@@ -8,4 +8,90 @@
   Run `npm i` to install the dependencies.
 
   Run `npm run dev` to start the development server.
+
+  ## Personalizing the Proposal
+
+  You can personalize the proposal by adding a receiver's name in the URL. The name is encoded for privacy.
+
+  ### Generate a personalized URL
+
+  **Option 1: Web Interface (Hidden Route)**
+
+  Visit the hidden encoder route at `/encode` to use a web-based encoder:
+
+  ```
+  http://localhost:5173/encode
+  ```
+
+  This provides a user-friendly interface where you can:
+  - Enter a name
+  - Get the encoded text instantly
+  - Copy the full URL with one click
+  - See a preview of what the recipient will see
+
+  **Option 2: Command Line Script**
+
+  Use the helper script to generate an encoded URL:
+
+  ```bash
+  node generate-url.js "Caron"
+  ```
+
+  This will output a URL like:
+  ```
+  http://localhost:5173?receiver=Q2Fyb24
+  ```
+
+  When someone visits this URL, they'll see: **"Caron, will you be my Valentine?"** instead of the generic message.
+
+  ### Manual URL generation
+
+  If you prefer to generate the URL manually, you can use the encoding function in the browser console:
+
+  ```javascript
+  // Encode a name
+  function encodeName(name) {
+    return btoa(encodeURIComponent(name))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+  }
+  
+  encodeName("Caron"); // Returns: "Q2Fyb24"
+  ```
+
+  Then add it to your URL: `?receiver=Q2Fyb24`
+
+  ### Notes
+
+  - If no `receiver` parameter is provided or if it's invalid, the default message "Will you be my Valentine?" will be displayed
+  - Names are validated to ensure they contain only letters, spaces, hyphens, apostrophes, and periods
+  - Maximum name length is 50 characters
+
+  ## Firebase Integration
+
+  The app is integrated with Firebase Realtime Database to log proposal acceptances. When someone accepts a proposal, the following information is saved:
+
+  - Receiver name (if provided)
+  - Timestamp
+  - Date (ISO format)
+  - User agent
+
+  ### Firebase Configuration
+
+  Firebase is configured in `src/config/firebase.ts`. The configuration uses:
+  - Firebase Realtime Database
+  - Data is stored under the `proposals` node
+
+  ### Viewing Data
+
+  You can view the logged proposals in your Firebase Console:
+  1. Go to [Firebase Console](https://console.firebase.google.com/)
+  2. Select your project: `valentine-f2bda`
+  3. Navigate to Realtime Database
+  4. View the `proposals` node to see all acceptances
+
+  ### Privacy Note
+
+  The logging happens silently in the background and doesn't affect the user experience. If logging fails, the app continues to work normally.
   
